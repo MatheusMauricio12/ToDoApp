@@ -1,4 +1,4 @@
-package ToDoApp;
+package com.matheusiowa12.entities;
 
 public class TodoItem {
     private String description;
@@ -22,6 +22,6 @@ public class TodoItem {
     }
 
     public String toString() {
-        return this.description + ", " + "\n";
+        return this.description + "\n";
     }
 }

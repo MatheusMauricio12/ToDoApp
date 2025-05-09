@@ -1,8 +1,12 @@
-import ToDoApp.TodoItem;
+import com.matheusiowa12.entities.TodoItem;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +23,7 @@ public class Main {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setLocationRelativeTo(null);
 
-    ImageIcon backgroundIcon = new ImageIcon("C:\\Users\\Matheus\\Downloads\\AluraPractices\\ToDoApp\\src\\resources\\task_image.png");
+    ImageIcon backgroundIcon = new ImageIcon("C:src\\com\\matheusiowa12\\resources\\task_image.png");
     Image backgroundImage = backgroundIcon.getImage();
 
     JPanel mainPanel = new JPanel(new BorderLayout()){
@@ -87,7 +91,6 @@ public class Main {
         Map<JCheckBox, TodoItem> checkboxTaskMap = new LinkedHashMap<>();
 
         for (TodoItem task: todoList){
-
             JCheckBox checkBox = new JCheckBox(" - " + task.getDescription());
             checkBox.setFont(new Font("Arial", Font.PLAIN, 14));
             checkboxTaskMap.put(checkBox, task);
@@ -116,7 +119,77 @@ public class Main {
     SaveTaskItem.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            String fileName = JOptionPane.showInputDialog("Please, type a name for the save file: ");
+            File directory = new File("src/com/matheusiowa12/savefiles");
 
+            FilenameFilter txtFilter = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    String lowercaseName = name.toLowerCase();
+                    return lowercaseName.endsWith(".txt");
+                }
+            };
+
+            File[] files = directory.listFiles(txtFilter);
+
+            if (fileName != null && !fileName.trim().isEmpty()){
+                try {
+                    FileWriter writeTxt = new FileWriter(new File(directory, fileName + ".txt"));
+                    for(TodoItem task : todoList){
+                        writeTxt.write(task.toString());
+                    }
+                    writeTxt.close();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+    });
+
+    LoadTaskItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JPanel filesPanel = new JPanel();
+            filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.Y_AXIS));
+
+            JScrollPane scrollPane = new JScrollPane(filesPanel);
+            scrollPane.setPreferredSize(new Dimension(300, 200));
+
+            Map<JCheckBox, File> checkBoxFileMap = new LinkedHashMap<>();
+
+            File directory = new File("src/com/matheusiowa12/savefiles");
+
+
+            FilenameFilter txtFilter = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    String lowercaseName = name.toLowerCase();
+                    return lowercaseName.endsWith(".txt");
+                }
+            };
+
+            File[] files = directory.listFiles(txtFilter);
+
+            if(files != null){
+                for(File file : files){
+                    JCheckBox checkBox = new JCheckBox(file.getName());
+                    checkBox.setFont(new Font("Arial", Font.PLAIN, 14 ));
+                    checkBoxFileMap.put(checkBox, file);
+                    filesPanel.add(checkBox);
+                }
+            }
+
+            int result = JOptionPane.showConfirmDialog(
+                    frame,
+                    scrollPane,
+                    "Please, select a save in order to load it:",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if(result == JOptionPane.OK_OPTION){
+                System.out.println("Wabalabadoobdoob");
+            }
         }
     });
 
