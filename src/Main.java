@@ -1,11 +1,17 @@
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.matheusiowa12.entities.JbuttonConfigs;
 import com.matheusiowa12.entities.TodoItem;
 import javax.swing.*;
 import java.awt.*;
 
 public static void main(String[] args) {
-    FlatLightLaf.setup();
-    ArrayList<TodoItem> todoList = new ArrayList<>();
+    try {
+        UIManager.setLookAndFeel(new FlatDarkLaf());
+    } catch (Exception e) {
+        System.err.println("Failed to initialize FlatLaf Dark Theme");
+    }    ArrayList<TodoItem> todoList = new ArrayList<>();
+
+    JbuttonConfigs cf = new JbuttonConfigs();
 
     JFrame frame = new JFrame("To-Do Application");
     frame.setSize(800, 600);
@@ -35,11 +41,17 @@ public static void main(String[] args) {
     JButton loadTaskItem = new JButton("Load task(s)");
     JButton exitItem = new JButton("Exit");
 
-    addTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    listTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    saveTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    loadTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    exitItem.setAlignmentX(Component.CENTER_ALIGNMENT);
+    cf.jButtonPattern(addTaskItem);
+    cf.jButtonPattern(listTaskItem);
+    cf.jButtonPattern(saveTaskItem);
+    cf.jButtonPattern(loadTaskItem);
+    cf.jButtonPattern(exitItem);
+
+    cf.jButtonMouseListener(addTaskItem);
+    cf.jButtonMouseListener(listTaskItem);
+    cf.jButtonMouseListener(saveTaskItem);
+    cf.jButtonMouseListener(loadTaskItem);
+    cf.jButtonMouseListener(exitItem);
 
     menuPanel.add(Box.createVerticalGlue());
     menuPanel.add(addTaskItem);
@@ -114,39 +126,35 @@ public static void main(String[] args) {
 
         File[] files = directory.listFiles(txtFilter);
 
-        if (files != null) {
-            for (File file : files) {
-                if (file.getName().equalsIgnoreCase(newFileName + ".txt")) {
-                    fileExists = true;
-                    break;
+        try {
+            if (files != null) {
+                for (File file : files) {
+                    if (file.getName().equalsIgnoreCase(newFileName + ".txt")) {
+                        fileExists = true;
+                        break;
+                    }
                 }
             }
-        }
-        if (fileExists) {
-            int result = JOptionPane.showConfirmDialog(frame, "⚠ File's name's already taken! Do you want to overwrite it ?");
-            if(result == JOptionPane.YES_OPTION){
-                try {
+            if (fileExists) {
+                int result = JOptionPane.showConfirmDialog(frame, "⚠ File's name's already taken! Do you want to overwrite it ?");
+                if (result == JOptionPane.YES_OPTION) {
                     FileWriter writeTxt = new FileWriter(new File(directory, newFileName + ".txt"));
                     for (TodoItem task : todoList) {
                         writeTxt.write(task.toString());
                     }
                     writeTxt.close();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, "⚠ An error's occurred!: " + ex.getMessage());
                 }
-            }
-        } else {
-            if (newFileName != null && !newFileName.trim().isEmpty()) {
-                try {
+            } else {
+                if (newFileName != null && !newFileName.trim().isEmpty()) {
                     FileWriter writeTxt = new FileWriter(new File(directory, newFileName + ".txt"));
                     for (TodoItem task : todoList) {
                         writeTxt.write(task.toString());
                     }
                     writeTxt.close();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, "⚠ An error's occurred!: " + ex.getMessage());
                 }
             }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "⚠ An error's occurred!: " + ex.getMessage());
         }
     });
 
