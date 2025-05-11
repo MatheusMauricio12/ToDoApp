@@ -1,8 +1,6 @@
 import com.matheusiowa12.entities.TodoItem;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,8 +10,6 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
     ArrayList<TodoItem> todoList = new ArrayList<>();
-
-    boolean running = true;
 
     JFrame frame = new JFrame("To-Do Application");
     frame.setSize(700, 500);
@@ -37,29 +33,29 @@ public class Main {
     menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
     menuPanel.setOpaque(false);
 
-    JButton AddTaskItem = new JButton("Add task(s)");
-    JButton ListTaskItem = new JButton("List task(s)");
-    JButton SaveTaskItem = new JButton("Save task(s)");
-    JButton LoadTaskItem = new JButton("Load task(s)");
-    JButton ExitItem = new JButton("Exit");
+    JButton addTaskItem = new JButton("Add task(s)");
+    JButton listTaskItem = new JButton("List task(s)");
+    JButton saveTaskItem = new JButton("Save task(s)");
+    JButton loadTaskItem = new JButton("Load task(s)");
+    JButton exitItem = new JButton("Exit");
 
-    AddTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    ListTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    SaveTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    LoadTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
-    ExitItem.setAlignmentX(Component.CENTER_ALIGNMENT);
+    addTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
+    listTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
+    saveTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
+    loadTaskItem.setAlignmentX(Component.CENTER_ALIGNMENT);
+    exitItem.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    menuPanel.add(Box.createVerticalGlue()); // pushes content to vertical center
-    menuPanel.add(AddTaskItem);
+    menuPanel.add(Box.createVerticalGlue());
+    menuPanel.add(addTaskItem);
     menuPanel.add(Box.createVerticalStrut(10));
-    menuPanel.add(ListTaskItem);
+    menuPanel.add(listTaskItem);
     menuPanel.add(Box.createVerticalStrut(10));
-    menuPanel.add(SaveTaskItem);
+    menuPanel.add(saveTaskItem);
     menuPanel.add(Box.createVerticalStrut(10));
-    menuPanel.add(LoadTaskItem);
+    menuPanel.add(loadTaskItem);
     menuPanel.add(Box.createVerticalStrut(10));
-    menuPanel.add(ExitItem);
-    menuPanel.add(Box.createVerticalGlue()); // balances bottom spacing
+    menuPanel.add(exitItem);
+    menuPanel.add(Box.createVerticalGlue());
 
 
     mainPanel.add(menuPanel, BorderLayout.CENTER);
@@ -67,18 +63,16 @@ public class Main {
     frame.setContentPane(mainPanel);
     frame.setVisible(true);
 
-    AddTaskItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
+    addTaskItem.addActionListener(e -> {
             String description = JOptionPane.showInputDialog("Please, type a task: ");
             if (description != null && !description.trim().isEmpty()){
                 TodoItem task = new TodoItem(description);
                 todoList.add(task);
-            }
         }
     });
 
 
-    ListTaskItem.addActionListener(e -> {
+    listTaskItem.addActionListener(e -> {
         JPanel tasksPanel = new JPanel();
         tasksPanel.setLayout(new BoxLayout(tasksPanel, BoxLayout.Y_AXIS));
 
@@ -113,9 +107,7 @@ public class Main {
         }
      });
 
-    SaveTaskItem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
+    saveTaskItem.addActionListener(e -> {
             String newFileName = JOptionPane.showInputDialog("Please, type a name for the save file: ");
             File directory = new File("src/com/matheusiowa12/savefiles");
             boolean fileExists = false;
@@ -153,12 +145,9 @@ public class Main {
                     }
                 }
             }
-        }
     });
 
-    LoadTaskItem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
+    loadTaskItem.addActionListener(e -> {
             JPanel filesPanel = new JPanel();
             filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.Y_AXIS));
 
@@ -218,13 +207,10 @@ public class Main {
                     ex.printStackTrace();
                 }
             }
-        }
     });
 
-    ExitItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            System.exit(0);
-            }
+    exitItem.addActionListener(e -> {
+         System.exit(0);
         });
     }
 }
