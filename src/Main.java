@@ -3,10 +3,7 @@ import com.matheusiowa12.entities.TodoItem;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -119,28 +116,41 @@ public class Main {
     SaveTaskItem.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String fileName = JOptionPane.showInputDialog("Please, type a name for the save file: ");
+            String newFileName = JOptionPane.showInputDialog("Please, type a name for the save file: ");
             File directory = new File("src/com/matheusiowa12/savefiles");
+            boolean fileExists = false;
 
             FilenameFilter txtFilter = new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    String lowercaseName = name.toLowerCase();
-                    return lowercaseName.endsWith(".txt");
+                    return name.toLowerCase().endsWith(".txt");
                 }
             };
 
             File[] files = directory.listFiles(txtFilter);
 
-            if (fileName != null && !fileName.trim().isEmpty()){
-                try {
-                    FileWriter writeTxt = new FileWriter(new File(directory, fileName + ".txt"));
-                    for(TodoItem task : todoList){
-                        writeTxt.write(task.toString());
+            if (files != null) {
+                for (File file : files) {
+                    if (file.getName().equalsIgnoreCase(newFileName + ".txt")) {
+                        fileExists = true;
+                        break;
                     }
-                    writeTxt.close();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                }
+            }
+            if(fileExists){
+                JOptionPane.showMessageDialog(null, "⚠ File's name's already taken! Please, try again!");
+                newFileName = JOptionPane.showInputDialog("Please, type a name for the save file:");
+            } else {
+                if (newFileName != null && !newFileName.trim().isEmpty()){
+                    try {
+                        FileWriter writeTxt = new FileWriter(new File(directory, newFileName + ".txt"));
+                        for(TodoItem task : todoList){
+                            writeTxt.write(task.toString());
+                        }
+                        writeTxt.close();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         }
@@ -155,27 +165,28 @@ public class Main {
             JScrollPane scrollPane = new JScrollPane(filesPanel);
             scrollPane.setPreferredSize(new Dimension(300, 200));
 
-            Map<JCheckBox, File> checkBoxFileMap = new LinkedHashMap<>();
+            Map<JRadioButton, File> radioButtonFileMap = new LinkedHashMap<>();
 
             File directory = new File("src/com/matheusiowa12/savefiles");
-
 
             FilenameFilter txtFilter = new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    String lowercaseName = name.toLowerCase();
-                    return lowercaseName.endsWith(".txt");
+                    return name.toLowerCase().endsWith(".txt");
                 }
             };
 
             File[] files = directory.listFiles(txtFilter);
 
+            ButtonGroup buttonGroup = new ButtonGroup();
+
             if(files != null){
                 for(File file : files){
-                    JCheckBox checkBox = new JCheckBox(file.getName());
-                    checkBox.setFont(new Font("Arial", Font.PLAIN, 14 ));
-                    checkBoxFileMap.put(checkBox, file);
-                    filesPanel.add(checkBox);
+                    JRadioButton radioButton = new JRadioButton(file.getName());
+                    radioButton.setFont(new Font("Arial", Font.PLAIN, 14 ));
+                    radioButtonFileMap.put(radioButton, file);
+                    buttonGroup.add(radioButton);
+                    filesPanel.add(radioButton);
                 }
             }
 
@@ -188,12 +199,27 @@ public class Main {
             );
 
             if(result == JOptionPane.OK_OPTION){
-                System.out.println("Wabalabadoobdoob");
+                ArrayList<File> toLoad = new ArrayList<>();
+                for(Map.Entry<JRadioButton, File> entry : radioButtonFileMap.entrySet()){
+                    if(entry.getKey().isSelected()){
+                        toLoad.add(entry.getValue());
+                    }
+                }
+                String filePath = toLoad.get(0).getAbsolutePath();
+
+                try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                    String line;
+                    todoList.clear();
+                    while ((line = br.readLine()) != null) {
+                       TodoItem task = new TodoItem(line);
+                       todoList.add(task);
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     });
-
-
 
     ExitItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
